@@ -226,11 +226,17 @@ class BinanceAPIManager:
         order = None
         while order is None:
             try:
-                order = self.binance_client.order_limit_buy(
-                    symbol=origin_symbol + target_symbol,
-                    quantity=order_quantity,
-                    price=from_coin_price,
-                )
+                if self.config.BUY_TYPE == 'limit':
+                    order = self.binance_client.order_limit_buy(
+                        symbol=origin_symbol + target_symbol,
+                        quantity=order_quantity,
+                        price=from_coin_price,
+                    )
+                else:
+                    order = self.binance_client.order_market_buy(
+                        symbol=origin_symbol + target_symbol,
+                        quantity=order_quantity * 0.95, # # 因为这里用了限价去计算order_quantity, 在市价买的时候只买95%
+                    ) 
                 self.logger.info(order)
             except BinanceAPIException as e:
                 self.logger.info(e)
@@ -278,9 +284,13 @@ class BinanceAPIManager:
         order = None
         while order is None:
             # Should sell at calculated price to avoid lost coin
-            order = self.binance_client.order_limit_sell(
-                symbol=origin_symbol + target_symbol, quantity=(order_quantity), price=from_coin_price
-            )
+            if self.config.SELL_TYPE == 'limit':
+                order = self.binance_client.order_limit_sell(
+                    symbol=origin_symbol + target_symbol, quantity=(order_quantity), price=from_coin_price
+                )
+            else:
+                order = self.binance_client.order_market_sell(
+                    symbol=origin_symbol + target_symbol, quantity=(order_quantity))
 
         self.logger.info("order")
         self.logger.info(order)
@@ -304,3 +314,6 @@ class BinanceAPIManager:
         trade_log.set_complete(stat["cummulativeQuoteQty"])
 
         return order
+
+    def get_btc_last_candle(self):
+        return self.binance_client.get_klines(symbol='BTCUSDT', interval=Client.KLINE_INTERVAL_1DAY, limit=1)

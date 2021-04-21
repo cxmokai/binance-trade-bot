@@ -20,6 +20,14 @@ class AutoTrader:
     def initialize(self):
         self.initialize_trade_thresholds()
 
+    # 根据BTC的趋势判断是否进行交易
+    # 最近一根日线为阳线为True
+    def is_tradeable(self):
+        last_candle = self.manager.get_btc_last_candle()
+        open_price = last_candle[1]
+        close_price = last_candle[4]
+        return close_price - open_price > 0
+
     def transaction_through_bridge(self, pair: Pair, all_tickers: AllTickers):
         """
         Jump from the source coin to the destination coin through bridge coin

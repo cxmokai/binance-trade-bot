@@ -14,6 +14,9 @@ class Strategy(AutoTrader):
         """
         Scout for potential jumps from the current coin to another coin
         """
+        if not self.is_tradeable():
+            self.logger.info("is_tradeable False")
+            return
         all_tickers = self.manager.get_all_market_tickers()
 
         current_coin = self.db.get_current_coin()
