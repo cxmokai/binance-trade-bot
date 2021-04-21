@@ -24,9 +24,11 @@ class AutoTrader:
     # 最近一根日线为阳线为True
     def is_tradeable(self):
         last_candle = self.manager.get_btc_last_candle()
-        open_price = last_candle[1]
-        close_price = last_candle[4]
-        return close_price - open_price > 0
+        open_price = float(last_candle[0][1])
+        close_price = float(last_candle[0][4])
+        self.logger.info(f"Open Price {open_price}, Close Price {close_price}")
+        self.logger.info(f"(open_price - close_price) / open_price * 100, {(open_price - close_price) / open_price * 100}")
+        return (close_price - open_price  > 0) or ((open_price - close_price) / open_price * 100 < 2)
 
     def transaction_through_bridge(self, pair: Pair, all_tickers: AllTickers):
         """

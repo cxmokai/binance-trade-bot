@@ -4,11 +4,13 @@ from datetime import datetime
 
 from binance_trade_bot.auto_trader import AutoTrader
 
+is_initialize_current_coin = False
 
 class Strategy(AutoTrader):
     def initialize(self):
         super().initialize()
-        self.initialize_current_coin()
+        if not self.is_tradeable():
+            self.initialize_current_coin()
 
     def scout(self):
         """
@@ -17,6 +19,10 @@ class Strategy(AutoTrader):
         if not self.is_tradeable():
             self.logger.info("is_tradeable False")
             return
+
+        if not is_initialize_current_coin:
+            self.initialize_current_coin()
+
         all_tickers = self.manager.get_all_market_tickers()
 
         current_coin = self.db.get_current_coin()
@@ -51,6 +57,7 @@ class Strategy(AutoTrader):
         """
         Decide what is the current coin, and set it up in the DB.
         """
+        is_initialize_current_coin = True
         if self.db.get_current_coin() is None:
             current_coin_symbol = self.config.CURRENT_COIN_SYMBOL
             if not current_coin_symbol:

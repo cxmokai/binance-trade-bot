@@ -235,7 +235,7 @@ class BinanceAPIManager:
                 else:
                     order = self.binance_client.order_market_buy(
                         symbol=origin_symbol + target_symbol,
-                        quantity=order_quantity * 0.95, # # 因为这里用了限价去计算order_quantity, 在市价买的时候只买95%
+                        quantity=order_quantity * 0.8, # # 因为这里用了限价去计算order_quantity, 在市价买的时候只买0.8
                     ) 
                 self.logger.info(order)
             except BinanceAPIException as e:
