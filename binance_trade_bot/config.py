@@ -72,3 +72,9 @@ class Config:  # pylint: disable=too-few-public-methods,too-many-instance-attrib
         self.BUY_TIMEOUT = os.environ.get("BUY_TIMEOUT") or config.get(USER_CFG_SECTION, "buy_timeout")
         self.SELL_TYPE = os.environ.get("SELL_TYPE") or config.get(USER_CFG_SECTION, "sell_type")
         self.BUY_TYPE = os.environ.get("BUY_TYPE") or config.get(USER_CFG_SECTION, "buy_type")
+
+        self.OPEN_DINGDING_NOTIFICATION = os.environ.get("OPEN_DINGDING_NOTIFICATION") or config.get(USER_CFG_SECTION, "open_dingding_notification")
+        self.DINGDING_NOTIFICATION_SECRET = os.environ.get("DINGDING_NOTIFICATION_SECRET") or config.get(USER_CFG_SECTION, "dingding_notification_secret")
+        self.DINGDING_NOTIFICATION_WEBHOOK = os.environ.get("DINGDING_NOTIFICATION_WEBHOOK") or config.get(USER_CFG_SECTION, "dingding_notification_webhook")
+        self.BTC_RETREAT_PERCENT = os.environ.get("BTC_RETREAT_PERCENT") or config.get(USER_CFG_SECTION, "btc_retreat_percent")
+        self.STOP_PROFIT_POINT = os.environ.get("STOP_PROFIT_POINT") or config.get(USER_CFG_SECTION, "stop_profit_point")

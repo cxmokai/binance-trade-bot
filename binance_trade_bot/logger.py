@@ -1,6 +1,6 @@
 import logging.handlers
 
-from .notifications import NotificationHandler
+from .notifications_dingding import NotificationDingDingHandler
 
 
 class Logger:
@@ -8,7 +8,7 @@ class Logger:
     Logger = None
     NotificationHandler = None
 
-    def __init__(self, logging_service="crypto_trading", enable_notifications=True):
+    def __init__(self, config, logging_service="crypto_trading"):
         # Logger setup
         self.Logger = logging.getLogger(f"{logging_service}_logger")
         self.Logger.setLevel(logging.DEBUG)
@@ -26,9 +26,9 @@ class Logger:
         self.Logger.addHandler(ch)
 
         # notification handler
-        self.NotificationHandler = NotificationHandler(enable_notifications)
+        self.NotificationHandler = NotificationDingDingHandler(config)
 
-    def log(self, message, level="info", notification=True):
+    def log(self, message, level="info", notification=False):
 
         if level == "info":
             self.Logger.info(message)
@@ -42,14 +42,14 @@ class Logger:
         if notification and self.NotificationHandler.enabled:
             self.NotificationHandler.send_notification(message)
 
-    def info(self, message, notification=True):
+    def info(self, message, notification=False):
         self.log(message, "info", notification)
 
-    def warning(self, message, notification=True):
+    def warning(self, message, notification=False):
         self.log(message, "warning", notification)
 
     def error(self, message, notification=True):
         self.log(message, "error", notification)
 
-    def debug(self, message, notification=True):
+    def debug(self, message, notification=False):
         self.log(message, "debug", notification)

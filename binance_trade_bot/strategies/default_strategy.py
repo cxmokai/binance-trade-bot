@@ -72,7 +72,7 @@ class Strategy(AutoTrader):
             # if we don't have a configuration, we selected a coin at random... Buy it so we can start trading.
             if self.config.CURRENT_COIN_SYMBOL == "":
                 current_coin = self.db.get_current_coin()
-                self.logger.info(f"Purchasing {current_coin} to begin trading")
+                self.logger.info(f"Purchasing {current_coin} to begin trading", True)
                 all_tickers = self.manager.get_all_market_tickers()
                 self.manager.buy_alt(current_coin, self.config.BRIDGE, all_tickers)
                 self.logger.info("Ready to start trading")

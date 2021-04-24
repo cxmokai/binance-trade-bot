@@ -26,9 +26,10 @@ class AutoTrader:
         last_candle = self.manager.get_btc_last_candle()
         open_price = float(last_candle[0][1])
         close_price = float(last_candle[0][4])
+        btc_retreat_percent = (open_price - close_price) / open_price * 100
         self.logger.info(f"Open Price {open_price}, Close Price {close_price}")
-        self.logger.info(f"(open_price - close_price) / open_price * 100, {(open_price - close_price) / open_price * 100}")
-        return (close_price - open_price  > 0) or ((open_price - close_price) / open_price * 100 < 2)
+        self.logger.info(f"BTC retreat, {btc_retreat_percent}")
+        return (close_price - open_price  > 0) or (btc_retreat_percent < float(self.config.BTC_RETREAT_PERCENT))
 
     def transaction_through_bridge(self, pair: Pair, all_tickers: AllTickers):
         """
@@ -155,7 +156,7 @@ class AutoTrader:
         # if we have any viable options, pick the one with the biggest ratio
         if ratio_dict:
             best_pair = max(ratio_dict, key=ratio_dict.get)
-            self.logger.info(f"Will be jumping from {coin} to {best_pair.to_coin_id}")
+            self.logger.info(f"Will be jumping from {coin} to {best_pair.to_coin_id}", True)
             self.transaction_through_bridge(best_pair, all_tickers)
 
     def bridge_scout(self):
@@ -175,7 +176,7 @@ class AutoTrader:
             if not any(v > 0 for v in ratio_dict.values()):
                 # There will only be one coin where all the ratios are negative. When we find it, buy it if we can
                 if bridge_balance > self.manager.get_min_notional(coin.symbol, self.config.BRIDGE.symbol):
-                    self.logger.info(f"Will be purchasing {coin} using bridge coin")
+                    self.logger.info(f"Will be purchasing {coin} using bridge coin", True)
                     self.manager.buy_alt(coin, self.config.BRIDGE, all_tickers)
                     return coin
         return None

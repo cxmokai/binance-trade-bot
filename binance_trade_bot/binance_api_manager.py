@@ -94,9 +94,9 @@ class BinanceAPIManager:
             try:
                 return func(*args, **kwargs)
             except Exception as e:  # pylint: disable=broad-except
-                self.logger.info("Failed to Buy/Sell. Trying Again.")
+                self.logger.info("Failed to Buy/Sell. Trying Again.", True)
                 if attempts == 0:
-                    self.logger.info(e)
+                    self.logger.info(e, True)
                 attempts += 1
         return None
 
@@ -124,10 +124,10 @@ class BinanceAPIManager:
                 order_status = self.binance_client.get_order(symbol=origin_symbol + target_symbol, orderId=order_id)
                 break
             except BinanceAPIException as e:
-                self.logger.info(e)
+                self.logger.info(e, True)
                 time.sleep(1)
             except Exception as e:  # pylint: disable=broad-except
-                self.logger.info(f"Unexpected Error: {e}")
+                self.logger.info(f"Unexpected Error: {e}", True)
                 time.sleep(1)
 
         self.logger.info(order_status)
@@ -164,10 +164,10 @@ class BinanceAPIManager:
 
                 time.sleep(1)
             except BinanceAPIException as e:
-                self.logger.info(e)
+                self.logger.info(e, True)
                 time.sleep(1)
             except Exception as e:  # pylint: disable=broad-except
-                self.logger.info(f"Unexpected Error: {e}")
+                self.logger.info(f"Unexpected Error: {e}", True)
                 time.sleep(1)
 
         return order_status
@@ -220,8 +220,7 @@ class BinanceAPIManager:
         from_coin_price = all_tickers.get_price(origin_symbol + target_symbol)
 
         order_quantity = self._buy_quantity(origin_symbol, target_symbol, target_balance, from_coin_price)
-        self.logger.info(f"BUY QTY {order_quantity}")
-
+        self.logger.info(f"{origin_symbol} balance is {origin_balance}, {target_symbol} Balance is {target_balance}, Buying {order_quantity} of {origin_symbol}, Price is {from_coin_price}, Total price is {order_quantity * from_coin_price}", True)
         # Try to buy until successful
         order = None
         while order is None:
@@ -239,10 +238,10 @@ class BinanceAPIManager:
                     ) 
                 self.logger.info(order)
             except BinanceAPIException as e:
-                self.logger.info(e)
+                self.logger.info(e, True)
                 time.sleep(1)
             except Exception as e:  # pylint: disable=broad-except
-                self.logger.info(f"Unexpected Error: {e}")
+                self.logger.info(f"Unexpected Error: {e}", True)
 
         trade_log.set_ordered(origin_balance, target_balance, order_quantity)
 
@@ -251,7 +250,7 @@ class BinanceAPIManager:
         if stat is None:
             return None
 
-        self.logger.info(f"Bought {origin_symbol}")
+        self.logger.info(f"Bought {origin_symbol}", True)
         trade_log.set_complete(stat["cummulativeQuoteQty"])
 
         return order
@@ -278,9 +277,7 @@ class BinanceAPIManager:
         from_coin_price = all_tickers.get_price(origin_symbol + target_symbol)
 
         order_quantity = self._sell_quantity(origin_symbol, target_symbol, origin_balance)
-        self.logger.info(f"Selling {order_quantity} of {origin_symbol}")
-
-        self.logger.info(f"Balance is {origin_balance}")
+        self.logger.info(f"{origin_symbol} is {origin_balance}, {target_symbol} is {target_balance}, Selling {order_quantity} of {origin_symbol}, Price is {from_coin_price}, Total price is {order_quantity * from_coin_price}", True)
         order = None
         while order is None:
             # Should sell at calculated price to avoid lost coin
@@ -309,7 +306,7 @@ class BinanceAPIManager:
         while new_balance >= origin_balance:
             new_balance = self.get_currency_balance(origin_symbol)
 
-        self.logger.info(f"Sold {origin_symbol}")
+        self.logger.info(f"Sold {origin_symbol}", True)
 
         trade_log.set_complete(stat["cummulativeQuoteQty"])
 

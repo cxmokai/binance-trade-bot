@@ -10,10 +10,11 @@ from .strategies import get_strategy
 
 
 def main():
-    logger = Logger()
+    config = Config()
+
+    logger = Logger(config)
     logger.info("Starting")
 
-    config = Config()
     db = Database(logger, config)
     manager = BinanceAPIManager(config, db, logger)
     strategy = get_strategy(config.STRATEGY)
@@ -21,7 +22,7 @@ def main():
         logger.error("Invalid strategy name")
         return
     trader = strategy(manager, db, logger, config)
-    logger.info(f"Chosen strategy: {config.STRATEGY}")
+    logger.info(f"Chosen strategy: {config.STRATEGY}", True)
 
     logger.info("Creating database schema if it doesn't already exist")
     db.create_database()
