@@ -4,24 +4,22 @@ from datetime import datetime
 
 from binance_trade_bot.auto_trader import AutoTrader
 
-is_initialize_current_coin = False
 
 class Strategy(AutoTrader):
+    def __init__(self, binance_manager, database, logger, config):
+        super().__init__(binance_manager, database, logger, config)
+        self.is_initialize_current_coin = False
+
     def initialize(self):
         super().initialize()
-        if not self.is_tradeable():
-            self.initialize_current_coin()
 
     def scout(self):
         """
         Scout for potential jumps from the current coin to another coin
         """
-        if not self.is_tradeable():
-            self.logger.info("is_tradeable False")
-            return
-
-        if not is_initialize_current_coin:
-            self.initialize_current_coin()
+        if not self.process_current_coin():
+            self.logger.info("Variable is_tradeable is False.")
+            return 
 
         all_tickers = self.manager.get_all_market_tickers()
 
@@ -53,26 +51,61 @@ class Strategy(AutoTrader):
         if new_coin is not None:
             self.db.set_current_coin(new_coin)
 
-    def initialize_current_coin(self):
+    def process_current_coin(self):
         """
         Decide what is the current coin, and set it up in the DB.
         """
-        is_initialize_current_coin = True
-        if self.db.get_current_coin() is None:
-            current_coin_symbol = self.config.CURRENT_COIN_SYMBOL
-            if not current_coin_symbol:
-                current_coin_symbol = random.choice(self.config.SUPPORTED_COIN_LIST)
-
-            self.logger.info(f"Setting initial coin to {current_coin_symbol}")
-
-            if current_coin_symbol not in self.config.SUPPORTED_COIN_LIST:
-                sys.exit("***\nERROR!\nSince there is no backup file, a proper coin name must be provided at init\n***")
-            self.db.set_current_coin(current_coin_symbol)
-
+        if not self.is_initialize_current_coin:
+            current_coin = self.config.CURRENT_COIN_SYMBOL
             # if we don't have a configuration, we selected a coin at random... Buy it so we can start trading.
-            if self.config.CURRENT_COIN_SYMBOL == "":
-                current_coin = self.db.get_current_coin()
-                self.logger.info(f"Purchasing {current_coin} to begin trading", True)
-                all_tickers = self.manager.get_all_market_tickers()
-                self.manager.buy_alt(current_coin, self.config.BRIDGE, all_tickers)
-                self.logger.info("Ready to start trading")
+            if current_coin == "":
+                if self.is_tradeable():
+                    current_coin = random.choice(self.config.SUPPORTED_COIN_LIST)
+                    self.db.set_current_coin(current_coin)
+                    self.logger.info(f"Setting initial coin to {current_coin}")
+                    self.logger.info(f"Purchasing {current_coin} to begin trading", True)
+                    all_tickers = self.manager.get_all_market_tickers()
+                    self.manager.buy_alt(self.db.get_coin(current_coin), self.config.BRIDGE, all_tickers)
+                    self.logger.info("Ready to start trading")
+                    self.is_initialize_current_coin = True
+                    return True
+                else:
+                    self.db.set_current_coin(self.config.BRIDGE_SYMBOL)
+                    self.logger.info("Process Current Coin, Now variable is_tradeable is False.")
+                    self.is_initialize_current_coin = True
+                    return False
+            else:
+                if self.is_tradeable():
+                    if current_coin not in self.config.SUPPORTED_COIN_LIST:
+                        sys.exit("***\nERROR!\nCurrent coin not in SUPPORTED_COIN_LIST\n***")
+                    self.db.set_current_coin(current_coin)
+                    self.logger.info(f"Setting initial coin to {current_coin}")
+                    self.logger.info("Ready to start trading")
+                    self.is_initialize_current_coin = True
+                    return True
+                else:
+                    self.logger.info(f"Process Current Coin, Variable is_initialize_current_coin is {False}, Now variable is_tradeable is False, Sell current coin {current_coin}", True)
+                    all_tickers = self.manager.get_all_market_tickers()
+                    self.manager.sell_alt(self.db.get_coin(current_coin), self.config.BRIDGE, all_tickers)
+                    self.db.set_current_coin(self.config.BRIDGE_SYMBOL)
+                    self.is_initialize_current_coin = True
+                    return False
+        else:
+            current_coin = self.db.get_current_coin().symbol
+            if self.is_tradeable():
+                if current_coin == self.config.BRIDGE_SYMBOL:
+                    current_coin = random.choice(self.config.SUPPORTED_COIN_LIST)
+                    self.db.set_current_coin(current_coin)
+                    self.logger.info(f"Setting initial coin to {current_coin}")
+                    self.logger.info(f"Purchasing {current_coin} to begin trading", True)
+                    all_tickers = self.manager.get_all_market_tickers()
+                    self.manager.buy_alt(self.db.get_coin(current_coin), self.config.BRIDGE, all_tickers)
+                    self.logger.info("Ready to start trading")
+                return True
+            else:
+                if current_coin != self.config.BRIDGE_SYMBOL:
+                    self.logger.info(f"Process Current Coin, Variable is_initialize_current_coin is {True}, Now variable is_tradeable is False, Sell current coin {current_coin}", True)
+                    all_tickers = self.manager.get_all_market_tickers()
+                    self.manager.sell_alt(self.db.get_coin(current_coin), self.config.BRIDGE, all_tickers)
+                    self.db.set_current_coin(self.config.BRIDGE_SYMBOL)
+                return False

@@ -93,10 +93,16 @@ class BinanceAPIManager:
         while attempts < 20:
             try:
                 return func(*args, **kwargs)
-            except Exception as e:  # pylint: disable=broad-except
-                self.logger.info("Failed to Buy/Sell. Trying Again.", True)
+            except BinanceAPIException as e:
+                self.logger.info("[BinanceAPIException]BinanceAPIManager retry failed to Buy/Sell. Trying Again.")
                 if attempts == 0:
-                    self.logger.info(e, True)
+                    self.logger.info(e)
+                    self.logger.info(f"Response Status Code: {e.status_code}, Binance Error Code: {e.code}, Binance Error Message: {e.message}", True)
+                attempts += 1
+            except Exception as e:  # pylint: disable=broad-except
+                self.logger.info("[Exception]BinanceAPIManager retry failed to Buy/Sell. Trying Again.")
+                if attempts == 0:
+                    self.logger.info(e)
                 attempts += 1
         return None
 
@@ -124,7 +130,8 @@ class BinanceAPIManager:
                 order_status = self.binance_client.get_order(symbol=origin_symbol + target_symbol, orderId=order_id)
                 break
             except BinanceAPIException as e:
-                self.logger.info(e, True)
+                self.logger.info(e)
+                self.logger.info(f"Response Status Code: {e.status_code}, Binance Error Code: {e.code}, Binance Error Message: {e.message}", True)
                 time.sleep(1)
             except Exception as e:  # pylint: disable=broad-except
                 self.logger.info(f"Unexpected Error: {e}", True)
@@ -164,7 +171,8 @@ class BinanceAPIManager:
 
                 time.sleep(1)
             except BinanceAPIException as e:
-                self.logger.info(e, True)
+                self.logger.info(e)
+                self.logger.info(f"Response Status Code: {e.status_code}, Binance Error Code: {e.code}, Binance Error Message: {e.message}", True)
                 time.sleep(1)
             except Exception as e:  # pylint: disable=broad-except
                 self.logger.info(f"Unexpected Error: {e}", True)
@@ -238,7 +246,8 @@ class BinanceAPIManager:
                     ) 
                 self.logger.info(order)
             except BinanceAPIException as e:
-                self.logger.info(e, True)
+                self.logger.info(e)
+                self.logger.info(f"Response Status Code: {e.status_code}, Binance Error Code: {e.code}, Binance Error Message: {e.message}", True)
                 time.sleep(1)
             except Exception as e:  # pylint: disable=broad-except
                 self.logger.info(f"Unexpected Error: {e}", True)
