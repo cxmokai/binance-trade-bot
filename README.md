@@ -165,7 +165,7 @@ A list of answers to what seem to be the most frequently asked questions can be 
 3. 滚动止盈
 4. 利用 ATR 策略选择冷启动货币
 5. 钉钉通知[done]
-6. 当判断不可交易时卖出已持有货币
+6. 不可交易时卖出已持有货币[done]
 7. BNB 支付手续费优化
 
 ## Disclaimer
