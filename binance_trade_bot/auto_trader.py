@@ -3,6 +3,8 @@ from typing import Dict, List
 
 from sqlalchemy.orm import Session
 
+from cachetools import TTLCache, cached
+
 from .binance_api_manager import AllTickers, BinanceAPIManager
 from .config import Config
 from .database import Database
@@ -22,6 +24,7 @@ class AutoTrader:
 
     # 根据BTC的趋势判断是否进行交易
     # 最近一根日线为阳线为True
+    @cached(cache=TTLCache(maxsize=1, ttl=1200))
     def is_tradeable(self):
         last_candle = self.manager.get_btc_last_candle()
         open_price = float(last_candle[0][1])
