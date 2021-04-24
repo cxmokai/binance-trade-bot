@@ -32,10 +32,10 @@ The bot jumps between a configured set of coins on the condition that it does no
 
 ## Binance Setup
 
--   Create a [Binance account](https://www.binance.com/en/register?ref=13222128) (Includes my referral link, I'll be super grateful if you use it).
--   Enable Two-factor Authentication.
--   Create a new API key.
--   Get a cryptocurrency. If its symbol is not in the default list, add it.
+- Create a [Binance account](https://www.binance.com/en/register?ref=13222128) (Includes my referral link, I'll be super grateful if you use it).
+- Enable Two-factor Authentication.
+- Create a new API key.
+- Get a cryptocurrency. If its symbol is not in the default list, add it.
 
 ## Tool Setup
 
@@ -49,15 +49,15 @@ Create a .cfg file named `user.cfg` based off `.user.cfg.example`, then add your
 
 **The configuration file consists of the following fields:**
 
--   **api_key** - Binance API key generated in the Binance account setup stage.
--   **api_secret_key** - Binance secret key generated in the Binance account setup stage.
--   **current_coin** - This is your starting coin of choice. This should be one of the coins from your supported coin list. If you want to start from your bridge currency, leave this field empty - the bot will select a random coin from your supported coin list and buy it.
--   **bridge** - Your bridge currency of choice. Notice that different bridges will allow different sets of supported coins. For example, there may be a Binance particular-coin/USDT pair but no particular-coin/BUSD pair.
--   **tld** - 'com' or 'us', depending on your region. Default is 'com'.
--   **hourToKeepScoutHistory** - Controls how many hours of scouting values are kept in the database. After the amount of time specified has passed, the information will be deleted.
--   **scout_multiplier** - Controls the value by which the difference between the current state of coin ratios and previous state of ratios is multiplied. For bigger values, the bot will wait for bigger margins to arrive before making a trade.
--   **strategy** - The trading strategy to use. See [`binance_trade_bot/strategies`](binance_trade_bot/strategies/README.md) for more information
--   **buy_timeout/sell_timeout** - Controls how many minutes to wait before cancelling a limit order (buy/sell) and returning to "scout" mode. 0 means that the order will never be cancelled prematurely.
+- **api_key** - Binance API key generated in the Binance account setup stage.
+- **api_secret_key** - Binance secret key generated in the Binance account setup stage.
+- **current_coin** - This is your starting coin of choice. This should be one of the coins from your supported coin list. If you want to start from your bridge currency, leave this field empty - the bot will select a random coin from your supported coin list and buy it.
+- **bridge** - Your bridge currency of choice. Notice that different bridges will allow different sets of supported coins. For example, there may be a Binance particular-coin/USDT pair but no particular-coin/BUSD pair.
+- **tld** - 'com' or 'us', depending on your region. Default is 'com'.
+- **hourToKeepScoutHistory** - Controls how many hours of scouting values are kept in the database. After the amount of time specified has passed, the information will be deleted.
+- **scout_multiplier** - Controls the value by which the difference between the current state of coin ratios and previous state of ratios is multiplied. For bigger values, the bot will wait for bigger margins to arrive before making a trade.
+- **strategy** - The trading strategy to use. See [`binance_trade_bot/strategies`](binance_trade_bot/strategies/README.md) for more information
+- **buy_timeout/sell_timeout** - Controls how many minutes to wait before cancelling a limit order (buy/sell) and returning to "scout" mode. 0 means that the order will never be cancelled prematurely.
 
 #### Environment Variables
 
@@ -78,10 +78,12 @@ sell_timeout=0
 ```
 
 ### Paying Fees with BNB
+
 You can [use BNB to pay for any fees on the Binance platform](https://www.binance.com/en/support/faq/115000583311-Using-BNB-to-Pay-for-Fees), which will reduce all fees by 25%. In order to support this benefit, the bot will always perform the following operations:
--   Automatically detect that you have BNB fee payment enabled.
--   Make sure that you have enough BNB in your account to pay the fee of the inspected trade.
--   Take into consideration the discount when calculating the trade threshold.
+
+- Automatically detect that you have BNB fee payment enabled.
+- Make sure that you have enough BNB in your account to pay the fee of the inspected trade.
+- Take into consideration the discount when calculating the trade threshold.
 
 ### Notifications with Apprise
 
@@ -146,7 +148,7 @@ Thanks to a group of talented developers, there is now a [Telegram bot for remot
 
 ## Join the Chat
 
--   **Discord**: [Invite Link](https://discord.gg/m4TNaxreCN)
+- **Discord**: [Invite Link](https://discord.gg/m4TNaxreCN)
 
 ## FAQ
 
@@ -155,6 +157,16 @@ A list of answers to what seem to be the most frequently asked questions can be 
 <p align="center">
   <img src = "https://usercontent2.hubstatic.com/6061829.jpg">
 </p>
+
+## Improvement
+
+1. 根据比特币的趋势判断是否进行交易[done]
+2. 卖出时采用市价单[done]
+3. 滚动止盈
+4. 利用 ATR 策略选择冷启动货币
+5. 钉钉通知[done]
+6. 当判断不可交易时卖出已持有货币
+7. BNB 支付手续费优化
 
 ## Disclaimer
 

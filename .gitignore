@@ -13,3 +13,4 @@ venv/
 crypto_trading.db
 apprise.yml
 .DS_Store
+test.py
