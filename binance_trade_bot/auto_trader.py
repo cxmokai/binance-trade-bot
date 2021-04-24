@@ -30,8 +30,7 @@ class AutoTrader:
         open_price = float(last_candle[0][1])
         close_price = float(last_candle[0][4])
         btc_retreat_percent = (open_price - close_price) / open_price * 100
-        self.logger.info(f"Open Price {open_price}, Close Price {close_price}")
-        self.logger.info(f"BTC retreat, {btc_retreat_percent}")
+        self.logger.info(f"Open Price: {open_price}, Close Price: {close_price}, BTC Retreat: {btc_retreat_percent}", True)
         return (close_price - open_price  > 0) or (btc_retreat_percent < float(self.config.BTC_RETREAT_PERCENT))
 
     def transaction_through_bridge(self, pair: Pair, all_tickers: AllTickers):
